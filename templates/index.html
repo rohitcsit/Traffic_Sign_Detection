@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Sign Detection Application</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/x-icon">
+</head>
+
+<style>
+    body {
+        background-color: #f4f4f4;
+    }
+
+    .container {
+        margin-top: 10px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    #detection-result {
+        padding: 10px;
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    #sample-image {
+        margin-top: 20px;
+        max-width: 100%;
+    }
+
+    #predicted {
+        max-width: 100%;
+        width: 100%;
+        height: 250px;
+        object-fit: contain;
+    }
+
+    .confidence-meter {
+        height: 20px;
+        background-color: #e9ecef;
+        border-radius: 10px;
+        margin: 10px 0;
+    }
+
+    .confidence-fill {
+        height: 100%;
+        border-radius: 10px;
+        background-color: #28a745;
+        width: 0%;
+        transition: width 0.5s;
+    }
+</style>
+
+<body>
+
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="{{ url_for('static',filename='img/icon.png') }}" alt="Logo" width="40" height="30" class="d-inline-block align-text-top">
+                Traffic Sign Detection
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Traffic Sign Detection System</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <hr class="border border-primary border-3 opacity-75">
+                <form method="post" action="{{url_for('home')}}" enctype="multipart/form-data">
+
+                    <div class="form-group">
+                        <label for="location">Location Where Sign Was Spotted</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image-upload">Upload Traffic Sign Image</label>
+                        <input type="file" class="form-control" id="image-upload" accept=".jpg,.jpeg,.png" name="img" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Detect</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <div id="detection-result">
+                    {% if location %}
+                    <h2>Detection Result</h2>
+                    <hr class="border border-primary border-3 opacity-75">
+                    <p>Location: {{location}}</p>
+                    <hr>
+                    <p>Predicted Sign: {{result['class_name']}}</p>
+                    <p>Confidence: {{ "%.2f"|format(result['confidence'] * 100) }}%</p>
+                    <div class="confidence-meter">
+                        <div class="confidence-fill" style="width: {{ result['confidence'] * 100 }}%"></div>
+                    </div>
+                </div>
+                {% endif %}
+                <div>
+                    <hr class="border border-success border-3 opacity-75">
+                    {% if img %}
+                    <div class="row">
+                        <div class="col">
+                            <img src="{{ url_for('uploaded_file', filename=img) }}" alt="Uploaded Image" id="predicted" class="img-fluid">
+                        </div>
+                        <div class="col">
+                            <p>{{result['description']}}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/traffic_sample.jpg') }}" alt="Sample Traffic Sign" id="sample-image" class="img-fluid my-2" style="border-radius: 4%;">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
